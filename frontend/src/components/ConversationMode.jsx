@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useVoiceRecognition } from '../hooks/useVoiceRecognition';
-import { callConverseApi } from '../api/apiService';
+// ✅ CHANGED: Import API_BASE_URL
+import { callConverseApi, API_BASE_URL } from '../api/apiService';
 import micIconUrl from '../assets/microphone.svg';
 
 const LANGUAGE_MAP = {
@@ -22,14 +23,14 @@ const ConversationMode = () => {
     const { text, isListening, startListening, stopListening, hasSupport } = useVoiceRecognition({ lang: LANGUAGE_MAP[langName].recog_lang });
 
     useEffect(() => {
-        // Start the conversation when language or proficiency changes
         const startConversation = async () => {
             setStatus('thinking');
             try {
                 const result = await callConverseApi('', langName, proficiency, LANGUAGE_MAP[langName].voice, []);
                 setHistory(result.history);
 
-                const audioUrl = `http://localhost:8000${result.audio_url}?t=${new Date().getTime()}`;
+                // ✅ CHANGED: Use the imported API_BASE_URL
+                const audioUrl = `${API_BASE_URL}${result.audio_url}?t=${new Date().getTime()}`;
                 const audio = new Audio(audioUrl);
                 audio.play();
                 setStatus('idle');
@@ -42,7 +43,6 @@ const ConversationMode = () => {
     }, [langName, proficiency]);
 
     useEffect(() => {
-      // Auto-scroll chat history
       if (chatBoxRef.current) {
         chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
       }
@@ -52,15 +52,14 @@ const ConversationMode = () => {
         if (isListening) {
             stopListening();
             setStatus('thinking');
-
-            // Use a slight delay to ensure the final text is captured from the hook
             setTimeout(async () => {
                 try {
                     const finalRecognizedText = text;
                     const result = await callConverseApi(finalRecognizedText, langName, proficiency, LANGUAGE_MAP[langName].voice, history);
                     setHistory(result.history);
                     
-                    const audioUrl = `http://localhost:8000${result.audio_url}?t=${new Date().getTime()}`;
+                    // ✅ CHANGED: Use the imported API_BASE_URL
+                    const audioUrl = `${API_BASE_URL}${result.audio_url}?t=${new Date().getTime()}`;
                     const audio = new Audio(audioUrl);
                     audio.play();
                     setStatus('idle');
@@ -69,7 +68,6 @@ const ConversationMode = () => {
                     setStatus('error');
                 }
             }, 500);
-
         } else {
             startListening();
             setStatus('listening');

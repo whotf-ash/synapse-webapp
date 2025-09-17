@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+// This will use your live backend URL in production, and localhost for development
+export const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 export const callTranslateApi = async (text, lang_name, voice) => {
     const response = await fetch(`${API_BASE_URL}/api/translate`, {

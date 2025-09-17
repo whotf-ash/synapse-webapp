@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useVoiceRecognition } from '../hooks/useVoiceRecognition';
-import { callTranslateApi } from '../api/apiService';
+// ✅ CHANGED: Import API_BASE_URL
+import { callTranslateApi, API_BASE_URL } from '../api/apiService';
 import micIconUrl from '../assets/microphone.svg';
 
 const LANGUAGE_MAP = {
@@ -29,8 +30,8 @@ const TranslatorMode = () => {
                 setOriginalText(finalRecognizedText);
                 setTranslatedText(result.text);
                 
-                // Add timestamp to prevent browser caching
-                const audioUrl = `http://localhost:8000${result.audio_url}?t=${new Date().getTime()}`;
+                // ✅ CHANGED: Use the imported API_BASE_URL
+                const audioUrl = `${API_BASE_URL}${result.audio_url}?t=${new Date().getTime()}`;
                 const audio = new Audio(audioUrl);
                 audio.play();
                 setStatus('idle');
