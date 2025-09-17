@@ -1,0 +1,187 @@
+/* --- Global Styles & Variables --- */
+:root {
+  --primary-color: #007bff;
+  --primary-hover: #0056b3;
+  --secondary-color: #6c757d;
+  --background-color: #f0f2f5;
+  --card-background: #ffffff;
+  --text-color: #333;
+  --border-color: #ddd;
+  --danger-color: #dc3545;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 5px;
+}
+
+h2 {
+  font-size: 1.5rem;
+  color: var(--secondary-color);
+  margin-top: 0;
+  margin-bottom: 40px;
+}
+
+.card {
+  background-color: var(--card-background);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.back-button {
+  background: none;
+  color: var(--secondary-color);
+  align-self: flex-start;
+  padding: 5px;
+  margin-bottom: -10px;
+}
+.back-button:hover {
+  color: var(--primary-color);
+}
+
+.mode-selector button {
+  background-color: var(--primary-color);
+  color: white;
+  width: 100%;
+  padding: 15px;
+  font-size: 1.1rem;
+}
+.mode-selector button:hover {
+  background-color: var(--primary-hover);
+}
+
+select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 1em;
+}
+
+.status-display {
+  text-align: center;
+  font-size: 1.1em;
+  color: var(--primary-color);
+  min-height: 25px;
+}
+
+.record-button {
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+}
+.record-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.5);
+}
+.record-button.recording {
+  background-color: var(--danger-color);
+  box-shadow: 0 0 0 10px rgba(220, 53, 69, 0.4);
+  animation: pulse 1.5s infinite;
+}
+.record-button svg {
+  width: 28px;
+  height: 28px;
+}
+.record-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.record-button img {
+  width: 28px;
+  height: 28px;
+  /* This CSS filter turns the black SVG white */
+  filter: brightness(0) invert(1);
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.5); }
+  70% { box-shadow: 0 0 0 15px rgba(220, 53, 69, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+}
+
+.conversation-history {
+  height: 200px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.chat-bubble {
+  padding: 8px 12px;
+  border-radius: 15px;
+  max-width: 80%;
+}
+.user {
+  background-color: var(--primary-color);
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 3px;
+}
+.model {
+  background-color: #e9ecef;
+  color: var(--text-color);
+  align-self: flex-start;
+  border-bottom-left-radius: 3px;
+}
+
+.text-display {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1.1em;
+  resize: none;
+  box-sizing: border-box;
+}
