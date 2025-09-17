@@ -1,13 +1,13 @@
 import os
 import asyncio
-import uuid  # ✅ NEW: For generating unique filenames
-import time  # ✅ NEW: For cleanup task
-from glob import glob # ✅ NEW: For finding files to clean up
+import uuid
+import time
+from glob import glob
 from dotenv import load_dotenv
 import google.generativeai as genai
 import edge_tts
 import uvicorn
-from fastapi import FastAPI, BackgroundTasks # ✅ NEW: For running cleanup in the background
+from fastapi import FastAPI, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Dict
@@ -16,8 +16,12 @@ from fastapi.responses import FileResponse
 # --- App Setup ---
 app = FastAPI()
 
-# CORS Middleware
-origins = ["http://localhost:3000", "http://localhost:5173"]
+# CORS Middleware to allow your frontend to connect
+origins = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://synapse-webapp.netlify.app" # Allows your live website to connect
+]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -56,7 +60,7 @@ def get_conversation_prompt(language_name: str, proficiency: str) -> str:
     return prompts.get(proficiency, prompts["intermediate"])
 
 async def text_to_speech(text: str, voice: str) -> str | None:
-    """ ✅ CHANGED: Generates a unique filename and returns it. """
+    """Generates a unique filename for the audio and returns it."""
     try:
         unique_filename = f"{uuid.uuid4()}.mp3"
         communicate = edge_tts.Communicate(text, voice)
@@ -67,8 +71,8 @@ async def text_to_speech(text: str, voice: str) -> str | None:
         return None
 
 def cleanup_files(filename: str):
-    """ ✅ NEW: Deletes the given file and any other old mp3 files. """
-    time.sleep(10) # Wait 10 seconds before deleting to ensure file has been sent
+    """Deletes the given file after a delay and cleans up other old mp3 files."""
+    time.sleep(10) # Wait before deleting to ensure the file has been sent
     try:
         os.remove(filename)
         # Also clean up any other mp3 files older than 5 minutes
@@ -125,7 +129,7 @@ async def converse(request: ConverseRequest, background_tasks: BackgroundTasks):
 
 @app.get("/audio/{filename}")
 async def get_audio(filename: str):
-    # Basic security check to prevent directory traversal
+    # Basic security check
     if ".." in filename or not filename.endswith(".mp3"):
         return {"error": "Invalid filename"}, 400
     return FileResponse(path=filename, media_type="audio/mpeg", filename=filename)
