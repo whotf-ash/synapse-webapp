@@ -16,11 +16,11 @@ from fastapi.responses import FileResponse
 # --- App Setup ---
 app = FastAPI()
 
-# CORS Middleware to allow your frontend to connect
+# CORS Middleware
 origins = [
     "http://localhost:3000",
     "http://localhost:5173",
-    "https://synapse-webapp.netlify.app" # Allows your live website to connect
+    "https://synapse-webapp.netlify.app"
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -60,7 +60,6 @@ def get_conversation_prompt(language_name: str, proficiency: str) -> str:
     return prompts.get(proficiency, prompts["intermediate"])
 
 async def text_to_speech(text: str, voice: str) -> str | None:
-    """Generates a unique filename for the audio and returns it."""
     try:
         unique_filename = f"{uuid.uuid4()}.mp3"
         communicate = edge_tts.Communicate(text, voice)
@@ -71,11 +70,9 @@ async def text_to_speech(text: str, voice: str) -> str | None:
         return None
 
 def cleanup_files(filename: str):
-    """Deletes the given file after a delay and cleans up other old mp3 files."""
-    time.sleep(10) # Wait before deleting to ensure the file has been sent
+    time.sleep(10)
     try:
         os.remove(filename)
-        # Also clean up any other mp3 files older than 5 minutes
         for file in glob("*.mp3"):
             if os.path.getmtime(file) < time.time() - 300:
                 os.remove(file)
@@ -99,7 +96,7 @@ async def translate(request: TranslateRequest, background_tasks: BackgroundTasks
     
     unique_filename = await text_to_speech(translated_text, request.voice)
     if unique_filename:
-        background_tasks.add_task(cleanup_files, unique_filename) # Schedule cleanup
+        background_tasks.add_task(cleanup_files, unique_filename)
         return {"text": translated_text, "audio_url": f"/audio/{unique_filename}"}
     else:
         return {"error": "Failed to generate audio"}, 500
@@ -110,7 +107,8 @@ async def converse(request: ConverseRequest, background_tasks: BackgroundTasks):
     
     formatted_history = [{'role': p['role'], 'parts': [p['parts']]} for p in request.history]
     
-    if not formatted_history:
+    # This block correctly handles the initial empty request
+    if not formatted_history or not request.text:
         system_prompt = get_conversation_prompt(request.lang_name, request.proficiency)
         chat = model.start_chat(history=[
             {'role': 'user', 'parts': [system_prompt]},
@@ -125,7 +123,7 @@ async def converse(request: ConverseRequest, background_tasks: BackgroundTasks):
     
     unique_filename = await text_to_speech(ai_text, request.voice)
     if unique_filename:
-        background_tasks.add_task(cleanup_files, unique_filename) # Schedule cleanup
+        background_tasks.add_task(cleanup_files, unique_filename)
         new_history = [{'role': p.role, 'parts': p.parts[0].text} for p in chat.history]
         return {"text": ai_text, "audio_url": f"/audio/{unique_filename}", "history": new_history}
     else:
@@ -133,7 +131,6 @@ async def converse(request: ConverseRequest, background_tasks: BackgroundTasks):
 
 @app.get("/audio/{filename}")
 async def get_audio(filename: str):
-    # Basic security check
     if ".." in filename or not filename.endswith(".mp3"):
         return {"error": "Invalid filename"}, 400
     return FileResponse(path=filename, media_type="audio/mpeg", filename=filename)
