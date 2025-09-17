@@ -11,6 +11,7 @@ function Navbar() {
       <div className="nav-links">
         <NavLink to="/translator">Translator</NavLink>
         <NavLink to="/conversation">Conversation Partner</NavLink>
+        <NavLink to="/history">History</NavLink>
       </div>
     </nav>
   );
