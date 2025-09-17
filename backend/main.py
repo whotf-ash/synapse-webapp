@@ -83,6 +83,10 @@ def cleanup_files(filename: str):
         print(f"Error during file cleanup: {e}")
 
 # --- API Endpoints ---
+@app.get("/")
+async def root():
+    return {"status": "ok", "message": "Synapse Backend is running."}
+
 @app.post("/api/translate")
 async def translate(request: TranslateRequest, background_tasks: BackgroundTasks):
     model = genai.GenerativeModel('gemini-1.5-flash-latest')
